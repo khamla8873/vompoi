@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ແຜນວົງຈອນເຄື່ອງສູບນ້ຳ DC 12V</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Phetsarath OT', 'Noto Sans Lao', 'Phetsarath', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #555;
+            margin: 25px 0 15px 0;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            color: #666;
+            margin: 15px 0 10px 0;
+        }
+
+        .circuit-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .circuit-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .component {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .battery {
+            width: 120px;
+            height: 180px;
+            background: linear-gradient(145deg, #ffd700, #ffb347);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border: 3px solid #333;
+            position: relative;
+        }
+
+        .battery::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            width: 40px;
+            height: 15px;
+            background: #ffb347;
+            border-radius: 5px 5px 0 0;
+            border: 2px solid #333;
+            border-bottom: none;
+        }
+
+        .battery::after {
+            content: '12V';
+            color: #333;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .motor {
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(145deg, #4a90e2, #357abd);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border: 3px solid #333;
+            position: relative;
+            animation: motorPulse 2s infinite;
+        }
+
+        @keyframes motorPulse {
+            0% { box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 15px 30px rgba(74,144,226,0.5); }
+            100% { box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        }
+
+        .motor span {
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .switch {
+            width: 100px;
+            height: 60px;
+            background: #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .switch.on {
+            background: #4CAF50;
+        }
+
+        .switch.off {
+            background: #f44336;
+        }
+
+        .switch-lever {
+            width: 30px;
+            height: 40px;
+            background: #333;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+
+        .switch.on .switch-lever {
+            transform: translateY(-5px) rotate(10deg);
+        }
+
+        .switch.off .switch-lever {
+            transform: translateY(5px) rotate(-10deg);
+        }
+
+        .wires {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .wire {
+            stroke: #333;
+            stroke-width: 3;
+            stroke-dasharray: 5,5;
+            animation: flow 1s linear infinite;
+        }
+
+        .wire.positive {
+            stroke: #ff4444;
+        }
+
+        .wire.negative {
+            stroke: #4444ff;
+        }
+
+        @keyframes flow {
+            to {
+                stroke-dashoffset: -10;
+            }
+        }
+
+        .water-container {
+            background: linear-gradient(145deg, #e0f2fe, #bae6fd);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .water-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .water-tank {
+            width: 150px;
+            height: 200px;
+            background: linear-gradient(145deg, #7dd3fc, #38bdf8);
+            border-radius: 0 0 30px 30px;
+            border: 4px solid #0284c7;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .water-level {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(145deg, #0ea5e9, #0284c7);
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { height: 70%; }
+            50% { height: 75%; }
+        }
+
+        .pipe {
+            width: 40px;
+            height: 150px;
+            background: #94a3b8;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .water-in-pipe {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(145deg, #0ea5e9, #0284c7);
+            animation: pumpWater 2s ease-in-out infinite;
+        }
+
+        @keyframes pumpWater {
+            0%, 100% { height: 30%; }
+            50% { height: 80%; }
+        }
+
+        .material-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .material-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s;
+        }
+
+        .material-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        }
+
+        .steps {
+            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .step {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .test-button:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(118,75,162,0.5);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .led {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #f44336;
+            transition: all 0.3s;
+        }
+
+        .led.on {
+            background: #4CAF50;
+            box-shadow: 0 0 20px #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            .circuit-diagram {
+                flex-direction: column;
+            }
+            
+            .component {
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 ແຜນວົງຈອນເຄື່ອງສູບນ້ຳ DC 12V 🔧</h1>
+
+        <!-- Interactive Circuit Diagram -->
+        <div class="circuit-section">
+            <h2>📊 ແຜນວົງຈອນໄຟຟ້າ</h2>
+            <div class="circuit-diagram" id="circuitDiagram">
+                <!-- Battery -->
+                <div class="component">
+                    <div class="battery">
+                        <div style="color: #333; font-weight: bold; margin-bottom: 10px;">+</div>
+                        <div style="color: #333; font-weight: bold; margin-top: 10px;">-</div>
+                    </div>
+                    <div style="margin-top: 10px; font-weight: bold;">ແບັດ 12V</div>
+                </div>
+
+                <!-- Switch -->
+                <div class="component">
+                    <div class="switch off" id="mainSwitch" onclick="toggleSwitch()">
+                        <div class="switch-lever"></div>
+                    </div>
+                    <div style="margin-top: 10px; font-weight: bold;">ສະວິດ</div>
+                </div>
+
+                <!-- Motor -->
+                <div class="component">
+                    <div class="motor" id="motor">
+                        <span>ມໍເຕີ</span>
+                        <span style="font-size: 14px;">DC 12V</span>
+                    </div>
+                </div>
+
+                <!-- Connection points -->
+                <svg class="wires" style="position: absolute; width: 100%; height: 100%;">
+                    <!-- Positive wire from battery to switch -->
+                    <line x1="calc(50% - 200px)" y1="50%" x2="calc(50% - 70px)" y2="50%" 
+                          stroke="#ff4444" stroke-width="3" stroke-dasharray="5,5" id="wire1"/>
+                    
+                    <!-- Positive wire from switch to motor -->
+                    <line x1="calc(50% + 30px)" y1="50%" x2="calc(50% + 150px)" y2="50%" 
+                          stroke="#ff4444" stroke-width="3" stroke-dasharray="5,5" id="wire2"/>
+                    
+                    <!-- Negative wire from motor to battery -->
+                    <line x1="calc(50% + 150px)" y1="calc(50% + 30px)" x2="calc(50% - 200px)" y2="calc(50% + 30px)" 
+                          stroke="#4444ff" stroke-width="3" stroke-dasharray="5,5" id="wire3"/>
+                    
+                    <!-- Voltage indicator -->
+                    <text x="calc(50% - 150px)" y="calc(50% - 20px)" fill="#ff4444" font-weight="bold">+12V</text>
+                    <text x="calc(50% - 150px)" y="calc(50% + 50px)" fill="#4444ff" font-weight="bold">GND</text>
+                </svg>
+            </div>
+
+            <div class="status-indicator">
+                <div class="led" id="statusLed"></div>
+                <span id="statusText">ສະຖານະ: ປິດຢູ່</span>
+            </div>
+
+            <button class="test-button" onclick="toggleSwitch()">
+                🔌 ທົດລອງເປີດ/ປິດວົງຈອນ
+            </button>
+        </div>
+
+        <!-- Water Pump Simulation -->
+        <div class="circuit-section water-container">
+            <h2>💧 ລະບົບສູບນ້ຳ</h2>
+            <div class="water-flow">
+                <div class="water-tank">
+                    <div class="water-level" id="waterTank"></div>
+                </div>
+                
+                <div class="pipe" id="pumpPipe">
+                    <div class="water-in-pipe" id="waterPipe"></div>
+                </div>
+                
+                <div class="water-tank">
+                    <div class="water-level" id="outputTank" style="height: 20%;"></div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                <span>🏭 ແຫຼ່ງນ້ຳ</span>
+                <span>⬆️ ທໍ່ສູບນ້ຳ</span>
+                <span>🏭 ຖັງຮັບນ້ຳ</span>
+            </div>
+        </div>
+
+        <!-- Material List -->
+        <div class="circuit-section">
+            <h2>📦 ລາຍການອຸປະກອນ</h2>
+            <div class="material-list">
+                <div class="material-item">⚡ ມໍເຕີໄຟຟ້າ DC 12V</div>
+                <div class="material-item">🔋 ແບັດ 12V</div>
+                <div class="material-item">🎚️ ສະວິດ (Switch)</div>
+                <div class="material-item">🔌 ສາຍໄຟ</div>
+                <div class="material-item">💧 ທໍ່ຢາງສຳລັບນ້ຳ</div>
+                <div class="material-item">🥤 ຝາຂວດພລາສຕິກ</div>
+                <div class="material-item">🔥 ກາວຮ້ອນ ຫຼື ກາວຕິດ</div>
+                <div class="material-item">🪵 ຖານໄມ້ ຫຼື ພາສຕິກ</div>
+                <div class="material-item">💧 ພາຊະນະໃສ່ນ້ຳ</div>
+            </div>
+        </div>
+
+        <!-- Assembly Steps -->
+        <div class="circuit-section steps">
+            <h2>📝 ຂັ້ນຕອນການປະກອບ</h2>
+            
+            <h3>1. ການຕໍ່ວົງຈອນໄຟຟ້າ</h3>
+            <div class="step">ຕໍ່ສາຍໄຟຈາກຂົ້ວບວກ (+) ຂອງແບັດ ໄປຫາສະວິດ</div>
+            <div class="step">ຕໍ່ສາຍໄຟຈາກສະວິດ ໄປຫາຂົ້ວບວກ (+) ຂອງມໍເຕີ</div>
+            <div class="step">ຕໍ່ສາຍໄຟຈາກຂົ້ວລົບ (-) ຂອງມໍເຕີ ໄປຫາຂົ້ວລົບ (-) ຂອງແບັດ</div>
+
+            <h3>2. ການປະກອບຊຸດສູບນ້ຳ</h3>
+            <div class="step">ຕິດຝາຂວດພລາສຕິກກັບເພົາມໍເຕີ ເພື່ອເຮັດເປັນໃບພັດ</div>
+            <div class="step">ເຈາະຮູໃສ່ຝາຂວດ ໃຫ້ເໝາະສົມກັບເພົາມໍເຕີ</div>
+            <div class="step">ໃຊ້ກາວຮ້ອນຕິດຝາຂວດໃຫ້ແໜ້ນ</div>
+
+            <h3>3. ການຕິດຕັ້ງທໍ່ນ້ຳ ແລະ ຖານ</h3>
+            <div class="step">ຕໍ່ທໍ່ຢາງໃສ່ທາງອອກຂອງນ້ຳ</div>
+            <div class="step">ຕິດມໍເຕີ ແລະ ສະວິດໃສ່ຖານດ້ວຍກາວຮ້ອນ</div>
+            <div class="step">ຈັດສາຍໄຟໃຫ້ຮຽບຮ້ອຍ ແລະ ປ້ອງກັນນ້ຳເຂົ້າ</div>
+        </div>
+
+        <!-- Warnings -->
+        <div class="warning">
+            ⚠️ ຂໍ້ຄວນລະວັງ:
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>ລະວັງຢ່າໃຫ້ນ້ຳເຂົ້າສ່ວນໄຟຟ້າ ເພາະອາດເກີດການລັດວົງຈອນ</li>
+                <li>ກວດສອບການຕໍ່ສາຍໄຟໃຫ້ຖືກຕ້ອງ ຂົ້ວບວກ-ຂົ້ວລົບ</li>
+                <li>ໃຊ້ກາວຮ້ອນປິດບໍລິເວນທີ່ຕໍ່ສາຍໄຟ ເພື່ອປ້ອງກັນນ້ຳ</li>
+                <li>ຢ່າໃຊ້ງານເມື່ອມືປຽກ ຫຼື ຢູ່ບ່ອນທີ່ມີນ້ຳຂັງ</li>
+            </ul>
+        </div>
+
+        <!-- Usage Instructions -->
+        <div class="circuit-section" style="background: linear-gradient(145deg, #e8f5e9, #c8e6c9);">
+            <h2>🎯 ວິທີໃຊ້ງານ</h2>
+            <ol style="margin-left: 20px; line-height: 2;">
+                <li>ວາງມໍເຕີສ່ວນໃບພັດລົງໃນນ້ຳ</li>
+                <li>ເປີດສະວິດ ເພື່ອໃຫ້ມໍເຕີເຮັດວຽກ</li>
+                <li>ນ້ຳຈະຖືກດູດ ແລະ ພຸ່ງອອກທາງທໍ່</li>
+                <li>ປິດສະວິດ ເມື່ອຕ້ອງການຢຸດເຮັດວຽກ</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let isSwitchOn = false;
+
+        function toggleSwitch() {
+            const switch_ = document.getElementById('mainSwitch');
+            const motor = document.getElementById('motor');
+            const statusLed = document.getElementById('statusLed');
+            const statusText = document.getElementById('statusText');
+            const waterPipe = document.getElementById('waterPipe');
+            const outputTank = document.getElementById('outputTank');
+            
+            isSwitchOn = !isSwitchOn;
+            
+            if (isSwitchOn) {
+                switch_.classList.remove('off');
+                switch_.classList.add('on');
+                motor.style.background = 'linear-gradient(145deg, #4CAF50, #45a049)';
+                motor.style.animation = 'motorPulse 1s infinite';
+                statusLed.className = 'led on';
+                statusText.innerHTML = 'ສະຖານະ: ເປີດຢູ່ ⚡';
+                waterPipe.style.animation = 'pumpWater 1s ease-in-out infinite';
+                outputTank.style.animation = 'wave 1s ease-in-out infinite';
+            } else {
+                switch_.classList.remove('on');
+                switch_.classList.add('off');
+                motor.style.background = 'linear-gradient(145deg, #4a90e2, #357abd)';
+                motor.style.animation = 'motorPulse 2s infinite';
+                statusLed.className = 'led';
+                statusText.innerHTML = 'ສະຖານະ: ປິດຢູ່';
+                waterPipe.style.animation = 'none';
+                outputTank.style.animation = 'none';
+            }
+        }
+
+        // Add click event to SVG lines for interactivity
+        document.querySelectorAll('.wire').forEach(wire => {
+            wire.addEventListener('click', () => {
+                alert('ສາຍໄຟ: ' + (wire.classList.contains('positive') ? 'ສາຍບວກ (+12V)' : 'ສາຍລົບ (GND)'));
+            });
+        });
+
+        // Add hover effects for components
+        const components = document.querySelectorAll('.battery, .motor, .switch');
+        components.forEach(component => {
+            component.addEventListener('mouseenter', (e) => {
+                e.target.style.transform = 'scale(1.05)';
+                e.target.style.transition = 'transform 0.3s';
+            });
+            
+            component.addEventListener('mouseleave', (e) => {
+                e.target.style.transform = 'scale(1)';
+            });
+        });
+
+        // Initialize
+        console.log('ແຜນວົງຈອນພ້ອມໃຊ້ງານ!');
+    </script>
+</body>
+</html>
